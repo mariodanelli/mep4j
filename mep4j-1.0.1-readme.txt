@@ -1,0 +1,107 @@
+Math Expression Parser 4 Java
+
+MEP4J is a high performance math expression strings parser for Java.
+
+The library manages the 5 operators (+, -, /, %, *) together with the following functions:
+- "abs" 	- absolute value: 									...abs(<double value>)...
+- "cos" 	- cosine:										...cos(<radian angle>)...
+- "sin"		- sine:											...sin(<radian angle>)...
+- "cosh"	- hyperbolic cosine:									...cosh(<radian angle>)...
+- "sinh"	- hyperbolic sine:									...sinh(<radian angle>)...
+- "acos"	- arccosine:										...acos(<double value>)...
+- "asin"	- asine:										...asin(<double value>)...
+- "tan"		- tangent:										...tan(<radian angle>)...
+- "tanh"	- hyperbolic tangent:									...tanh(<radian angle>)...
+- "atan"	- arc tangent:										...atan(<double value>)...
+- "atan2"	- "theta" of the polar coordinates (r, theta) converted from rectangular ones (x, y)	...atan2(<'x' double value>, <'y' double value>)...
+- "sqrt"	- square root:										...sqrt(<double value>)...
+- "cbrt"	- cube root:										...cbrt(<double value>)...
+- "root"	- root:											...root(<'num' double value>, <'root' double value>)...
+- "log"		- natural (base 'e') logarithm :							...log(<double value>)...
+- "log10"	- base 10 logarithm :									...log10(<double value>)...
+- "log1p"	- natural (base 'e') logarithm of the sum (argument plus '1')				...log1p(<double value>)...
+- "exp"		- Euler's number 'e' ^ argument								...exp(<double value>)...
+- "expm1"	- (Euler's number 'e' ^ argument) minus '1'						...expm1(<double value>)...
+- "pow"		- 'a' first argument ^ 'b' second argument						...pow(<'a' double value>, <'b' double value>)...
+
+The library supports custom and pre-loaded ("e" and "pi") variables (case insensitive).
+
+
+Usage examples:
+
+1. No Variables
+
+import net.sourceforge.mep4j.core.MathParser;
+import net.sourceforge.mep4j.core.MathParserException;
+
+...
+
+double myRes1 = new MathParser().parse("2 * 4 - 5").execute();
+
+
+2. With Variables
+
+import net.sourceforge.mep4j.core.MathParser;
+import net.sourceforge.mep4j.core.MathParserException;
+
+...
+
+double myRes1 = new MathParser().addVariable("S", 2.0).parse("s * 4 - 21").execute();
+
+
+3. Multiple executions (changing variable values)
+
+import net.sourceforge.mep4j.core.MathParser;
+import net.sourceforge.mep4j.core.MathParserException;
+
+...
+
+int num_variations = 100;
+int init_value = 10;
+MathParser mathParser = new MathParser();
+mathParser.addVariable("x", init_value);
+mathParser.parse("2 + (7 - 5) * 3.14159 * pow(x, (12-10)) + sin(-3.141)");
+for(int i = init_value; i < num_variations; ++i) {
+	Double result = mathParser.execute();
+	mathParser.addVariable("x", i);
+}
+
+
+Methods:
+
+Class "MathParser"
+
+- String getVersion() - Static
+
+Returns the version description
+
+- MathParser() - Constructor
+
+Instantiates the object
+
+- MathParser addVariable(String varName, Long longValue)
+
+Adds the value (name - Long value) to the parser and returns the MathParser object
+
+- MathParser putVariable(String varName, Double doubleValue)
+
+Adds the value (name - Double value) to the parser
+
+- Double getVariable(String varName)
+
+Returns the value (Double value) previously set to the parser or NULL
+
+- MathParser parse(String mathExpression)
+
+Parse the math expression to execute and returns the MathParser object.
+If the expression contains variables this method must be called after the "addVariable" method.
+
+- Double execute()
+
+Execute the expression previously parsed with the "parse(String)" method.
+If errors happened the method returns the "Double.Nan" value.
+
+- MathParserException getLastException()
+
+If the "execute()" method returns the "Double.Nan" value than this method will return the 
+exception that describes what was wrong in the last "execute()" or "parse(String)" method call.
