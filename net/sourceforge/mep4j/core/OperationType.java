@@ -1,5 +1,5 @@
 /*
-Copyright 2015 Mario Danelli (mario.danelli[at]gmail.com)
+Copyright 2018 Mario Danelli (mario.danelli[at]gmail.com)
  
 This file is part of MEP4J.
 
@@ -18,12 +18,18 @@ along with MEP4J.  If not, see <http://www.gnu.org/licenses/>.
 
 package net.sourceforge.mep4j.core;
 
+/**
+* MEP4J OperationType enum.
+*
+* @version 1.0.1
+* @author Mario Danelli (mario.danelli[at]gmail.com)
+*/
 enum OperationType {
 	MINUS, 		// +
 	PLUS, 		// -
 	MULTIPLY,	// *
 	DIVIDE,		// /
-	MODULE,		// %
+	MODULUS,	// %
 	ABS, 		// ¬ - 170	
 	ACOS, 		// ½ - 171	
 	ASIN, 		// ¼ - 172	

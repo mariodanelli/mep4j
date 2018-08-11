@@ -1,5 +1,5 @@
 /*
-Copyright 2015 Mario Danelli (mario.danelli[at]gmail.com)
+Copyright 2018 Mario Danelli (mario.danelli[at]gmail.com)
  
 This file is part of MEP4J.
 
@@ -16,8 +16,15 @@ You should have received a copy of the GNU Lesser General Public License
 along with MEP4J.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+
 package net.sourceforge.mep4j.core;
 
+/**
+* MEP4J ExecuteResult class.
+*
+* @version 1.0.1
+* @author Mario Danelli (mario.danelli[at]gmail.com)
+*/
 class ExecuteResult {
 		private Double[] results = { Double.NaN, Double.NaN };
 		private boolean variable= false;

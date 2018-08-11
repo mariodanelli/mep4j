@@ -1,5 +1,5 @@
 /*
-Copyright 2015 Mario Danelli (mario.danelli[at]gmail.com)
+Copyright 2018 Mario Danelli (mario.danelli[at]gmail.com)
  
 This file is part of MEP4J.
 
@@ -19,7 +19,14 @@ along with MEP4J.  If not, see <http://www.gnu.org/licenses/>.
 package net.sourceforge.mep4j.core;
 
 import java.util.HashMap;
+import java.util.Map;
 
+/**
+* MEP4J MathParser class.
+*
+* @version 1.0.1
+* @author Mario Danelli (mario.danelli[at]gmail.com)
+*/
 public class MathParser {
 	private static final String EXCEPTION_PARSE_METHOD_NOT_CALLED = "The 'parse' method hasn't been called";
 	private static final String EXCEPTION_CHARACTERS = "Exception while parsing characters";
@@ -31,30 +38,40 @@ public class MathParser {
 	private static final String EXCEPTION_VARIABLE_NAME_ONLY_ALPHABETIC = "Exception due to variable name contains no alphabetic chars: ";
 	private static final char SPECIAL_CHAR_PLACECARD = '¿';
 	private static final char SPECIAL_CHAR_VARIABLE = '?';
-	private static final String VERSION_STRING = "MEP4J - ver. 1.0.0 - 03/04/2015";
+	private static final String VERSION_STRING = "MEP4J - ver. 1.0.1 - 06/08/2018";
 	private static final MathParserException MME_NOT_PARSED = new MathParserException(EXCEPTION_PARSE_METHOD_NOT_CALLED);
 	private final int NUM_TO_MULTIPLY_INIITIAL_LENGTH = 2;
 	private final int NUM_MAX_FUNCTION_CHARS = 5;
 	private final int NUM_MIN_FUNCTION_CHARS = 3;
 	private final int NUM_MAX_VARIABLE_CHARS = NUM_MAX_FUNCTION_CHARS;
-	private HashMap<String, Double> hmVariables = null;
-	private HashMap<String, Double> hmVariablesNotModifable = null;
-	private HashMap<String, Character> hmFunctions = null;
-	private HashMap<Character, Integer> hmValidChars = null;
-	private StringBuilder[] arrToExecute = null;
-	private int numToExecute = 0;
-	private Double[][] arrExecuted = null;
-	private Double[][] arrExecutedNoVariables = null;
-	private MathParserException mme = null;
-	private int[] functionOpen = null;
+	private Map<String, Double> hmVariables;
+	private Map<String, Double> hmVariablesNotModifable;
+	private Map<String, Character> hmFunctions;
+	private Map<Character, Integer> hmValidChars;
+	private StringBuilder[] arrToExecute;
+	private int numToExecute;
+	private Double[][] arrExecuted;
+	private Double[][] arrExecutedNoVariables;
+	private MathParserException mme;
+	private int[] functionOpen;
+	private boolean parsed;
+	private boolean alreadyExecuted;
 	private int functionOpenIndex = -1;
-	private boolean parsed = false;
-	private boolean alreadyExecuted = false;
-	
-	public String getVersion() {
+
+	/**
+	 * Method that returns the MEP4J version string. 
+	 *
+	 * @return      The MEP4J string version.
+	 * @see         String
+	 */
+	public static String getVersion() {
 		return VERSION_STRING;
 	}
-	
+
+	/**
+	 * MathParser 'void' constructor. 
+	 *
+	 */
 	public MathParser() {
 		this.initFunctions();
 		this.initVariables();
@@ -66,11 +83,24 @@ public class MathParser {
 		mme = MME_NOT_PARSED;
 	}
 
+	/**
+	 * Method that returns the last MathParserException exception. 
+	 *
+	 * @return      The last MathParserException exception.
+	 * @see         MathParserException
+	 */
 	public MathParserException getLastException() {
 		return mme;
 	}
-
-	public MathParser parse(String toExecute) {
+	
+	/**
+	 * Parse the expression string before the execution. 
+	 *
+	 * @param	toParse	The expression string to parse before the execute method.
+	 * @return	The object MathParser with the parsed string.
+	 * @see    	#execute()
+	 */
+	public MathParser parse(String toParse) {
 		arrToExecute = null;
 		arrExecuted = null;
 		arrExecutedNoVariables = null;
@@ -78,15 +108,15 @@ public class MathParser {
 		functionOpen = null;
 		functionOpenIndex = -1;
 		try {
-			functionOpen = new int[toExecute.length()];
-			toExecute = this.prepare(toExecute);
-			int lengthArraysMustHave = toExecute.length() * NUM_TO_MULTIPLY_INIITIAL_LENGTH;
-			if (toExecute.length() > 0) {
+			functionOpen = new int[toParse.length()];
+			toParse = this.prepare(toParse);
+			int lengthArraysMustHave = toParse.length() * NUM_TO_MULTIPLY_INIITIAL_LENGTH;
+			if (toParse.length() > 0) {
 				if (mme == MME_NOT_PARSED) {
 					mme = null;
 				}
 				arrToExecute = new StringBuilder[lengthArraysMustHave];
-				arrToExecute[0] = new StringBuilder(toExecute);
+				arrToExecute[0] = new StringBuilder(toParse);
 				numToExecute = 1;
 				for (int i = 0; i < arrToExecute.length; ++i) {
 					if (this.parseSingle(i)) {
@@ -106,6 +136,12 @@ public class MathParser {
 		return this;
 	}
 
+	/**
+	 * Execute the math expression parsed before. 
+	 *
+	 * @return      The result of the execution or 'Double.NaN' in case of errors.
+	 * @see         #parse(String toParse)
+	 */
 	public Double execute() {
 		if (numToExecute <= 0)
 			return Double.NaN;
@@ -135,6 +171,15 @@ public class MathParser {
 		return results[0];
 	}
 
+	/**
+	 * Utility method used by the 'parse(String toParse)' method to manipulate the String 
+	 * for further elaborations. 
+	 *
+	 * @param       toPrepare	The starting String to prepare.
+	 * @return      The prepared (manipulated) string.
+	 * @throws      MathParserException in case of invalid characters or unknown functions.
+	 * @see         #parse(String toParse)
+	 */
 	private String prepare(String toPrepare) throws MathParserException {
 		StringBuilder prepared = new StringBuilder(toPrepare.length());
 		char foundPlusMinus = 0;
@@ -299,6 +344,15 @@ public class MathParser {
 		return prepared.toString();
 	}
 
+	/**
+	 * Utility method used by the 'parse(String toParse)' method to identify if the 
+	 * String 'toParse' could be divided into smaller execution steps.
+	 * 
+	 * @param	index	Character index to parse.
+	 * @return	The boolean value to specify if is possible to execute smaller steps.
+	 * @throws 	MathParserException in case of invalid use of parentheses.
+	 * @see		#parse(String toParse)
+	 */
 	private boolean parseSingle(int index) throws MathParserException {
 		boolean toBreak = true;
 		StringBuilder stringBuilderI = arrToExecute[index];
@@ -342,6 +396,14 @@ public class MathParser {
 		}
 	}
 
+	/**
+	 * Recursive utility method used by the 'execute()' method to execute single execution steps.
+	 * 
+	 * @param	toExecute	Smaller String chunk to execute.
+	 * @return 	The result of the execution.
+	 * @throws 	MathParserException in case of unknown functions or invalid number of arguments.
+	 * @see   	#execute()
+	 */
 	private ExecuteResult executeSingle(String toExecute)
 			throws MathParserException {
 		boolean containsVariable = false;
@@ -417,7 +479,7 @@ public class MathParser {
 				case '%': {
 					if (maxMultiplyDivideModule < 0) {
 						maxMultiplyDivideModule = i;
-						operationTypeMultiplyDivideModule = OperationType.MODULE;
+						operationTypeMultiplyDivideModule = OperationType.MODULUS;
 						toExecuteJustSub = false;
 					}
 					break;
@@ -594,6 +656,15 @@ public class MathParser {
 		return new ExecuteResult(toRet, containsVariable);
 	}
 
+	/**
+	 * Utility method used by the 'execute()' method to execute the base execution step.
+	 * 
+	 * @param	toExecute	Smaller String chunk to execute.
+	 * @return 	The result of the execution using the utility class 'ExecuteResult'.
+	 * @throws 	MathParserException in case of unknown function.
+	 * @see 	#execute()
+	 * @see 	ExecuteResult
+	 */
 	private ExecuteResult executeBase(String toExecute)
 			throws MathParserException {
 		Double toRet0 = Double.NaN, toRet1 = Double.NaN;
@@ -615,6 +686,17 @@ public class MathParser {
 		return new ExecuteResult(toRet0, toRet1, containsVariable);
 	}
 
+	/**
+	 * Utility method used by the 'executeSingle(String)' method to execute the base execution step.
+	 * 
+	 * @param	firstPart	The first operand.
+	 * @param	secondPart	The second operand.
+	 * @param	operationType	The operation type to execute.
+	 * @return 	the result of the execution using the utility class 'ExecuteResult'.
+	 * @throws 	MathParserException in case of invalid arguments.
+	 * @see   	#executeSingle(String)
+	 * @see    	ExecuteResult
+	 */
 	private ExecuteResult operation(String firstPart, String secondPart,
 			OperationType operationType) throws MathParserException {
 		Double toRet = Double.NaN;
@@ -708,7 +790,7 @@ public class MathParser {
 				}
 				break;
 			}
-			case MODULE: {
+			case MODULUS: {
 				if ("".equals(firstPart)) {
 					throw new MathParserException(EXCEPTION_EXECUTE);
 				} else if ("".equals(secondPart)) {
@@ -725,10 +807,19 @@ public class MathParser {
 				}
 				break;
 			}
+			default:
+				break;
 		}
 		return new ExecuteResult(toRet, containsVariable);
 	}
 
+	/**
+	 * Utility method used by the 'executeSingle(String toExecute)' method to translate temporary char to function to execute. 
+	 *
+	 * @param       charToCheck	The temporary char to translate to function to execute.
+	 * @return      The function type to execute.
+	 * @see         #executeSingle(String toExecute)
+	 */
 	private OperationType whichFunctionByChar(char charToCheck) {
 		OperationType toRet = null;
 		switch (charToCheck) {
@@ -816,6 +907,15 @@ public class MathParser {
 		return toRet;
 	}
 
+	/**
+	 * Method that execute the 'toExecute' string by applying the function 'functionType'.
+	 *
+	 * @param       functionType	The function type to execute.
+	 * @param       toExecute	The string to execute.
+	 * @return      The execution result.
+	 * @throws		MathParserException in case of invalid string to execute.
+	 * @see         #executeSingle(String toExecute)
+	 */
 	private ExecuteResult executeFunction(OperationType functionType, String toExecute) throws MathParserException {
 		Double toRet = null;
 		boolean containsVariable = false;
@@ -971,14 +1071,28 @@ public class MathParser {
 				toRet = Math.expm1(executeResult.getResults()[0]);
 				break;
 			}
+			default:
+				break;
 		}
 		return new ExecuteResult(toRet, containsVariable);
 	}
 
+	/**
+	 * Utility method that identify if the character 'c' to check is valid or not.
+	 *
+	 * @param       c	The character to check.
+	 * @return      The boolean validity check result.
+	 * @see         #prepare(String toPrepare)
+	 */
 	private boolean isAValidChar(char c) {
 		return hmValidChars.containsKey(c);
 	}
 
+	/**
+	 * Utility method that initialize the built-in variables.
+	 *
+	 * @see         #MathParser()
+	 */
 	private void initVariables() {
 		hmVariables = new HashMap<String, Double>();
 		hmVariablesNotModifable = new HashMap<String, Double>();
@@ -991,39 +1105,66 @@ public class MathParser {
 		addValidChar('i');
 	}
 
-	public MathParser addVariable(String varString, long varLong) throws MathParserException {
-		return addVariable(varString, new Double(varLong));
+	/**
+	 * Method that add the user 'long' variable ('varName' case insensitive).
+	 *
+	 * @param 	varName	The variable name to add.
+	 * @param 	varValueLong	The 'long' variable value.
+	 * @return	The object MathParser with added variable.
+	 * @throws	MathParserException in case of unacceptable name or unacceptable name string length.
+	 * @see   	#MathParser()
+	 */
+	public MathParser putVariable(String varName, long varValueLong) throws MathParserException {
+		return putVariable(varName, new Double(varValueLong));
 	}
-	
-	
-	public MathParser addVariable(String varString, Double varDouble)
+
+	/**
+	 * Method that add the user 'Double' variable ('varName' case insensitive).
+	 *
+	 * @param 	varName	The variable name to add.
+	 * @param 	varValueDouble	The 'Double' variable value.
+	 * @return	The object MathParser with added variable.
+	 * @throws	MathParserException in case of unacceptable name or unacceptable name string length.
+	 * @see   	#MathParser()
+	 */
+	public MathParser putVariable(String varName, Double varValueDouble)
 			throws MathParserException {
-		if (varString.length() > NUM_MAX_VARIABLE_CHARS) {
+		if (varName.length() > NUM_MAX_VARIABLE_CHARS) {
 			throw new MathParserException(EXCEPTION_VARIABLE_NAME_TOO_LONG
-					+ NUM_MAX_VARIABLE_CHARS + " - " + varString + " ("
-					+ varString.length() + ")");
+					+ NUM_MAX_VARIABLE_CHARS + " - " + varName + " ("
+					+ varName.length() + ")");
 		}
-		for (int i = 0; i < varString.length(); ++i) {
-			if (!Character.isAlphabetic(varString.charAt(i))) {
+		for (int i = 0; i < varName.length(); ++i) {
+			if (!Character.isAlphabetic(varName.charAt(i))) {
 				throw new MathParserException(
-						EXCEPTION_VARIABLE_NAME_ONLY_ALPHABETIC + varString);
+						EXCEPTION_VARIABLE_NAME_ONLY_ALPHABETIC + varName);
 			}
 		}
-		varString = varString.toLowerCase();
-		if (hmVariablesNotModifable.containsKey(varString)) {
+		varName = varName.toLowerCase();
+		if (hmVariablesNotModifable.containsKey(varName)) {
 			throw new MathParserException(EXCEPTION_ADD_VARIABLE_NOT_MODIFABLE);
 		}
-		hmVariables.put(varString, varDouble);
-		for (int i = 0; i < varString.length(); ++i) {
-			addValidChar(varString.charAt(i));
+		hmVariables.put(varName, varValueDouble);
+		for (int i = 0; i < varName.length(); ++i) {
+			addValidChar(varName.charAt(i));
 		}
 		return this;
 	}
 
-	public Double getVariable(String variableString) {
-		return hmVariables.get(variableString.toLowerCase());
+	/**
+	 * Method that return the 'Double' variable value ('varName' case insensitive).
+	 *
+	 * @param 	varName	The variable name to get.
+	 * @return	The variable 'Double' value.
+	 */
+	public Double getVariable(String varName) {
+		return hmVariables.get(varName.toLowerCase());
 	}
 
+	/**
+	 * Utility method that initialize the HashMap of valid (expected chars).
+	 *
+	 */
 	private void initValidChars() {
 		hmValidChars = new HashMap<Character, Integer>();
 		hmValidChars.put('c', 0);
@@ -1047,6 +1188,10 @@ public class MathParser {
 		hmValidChars.put('w', 0);
 	}
 
+	/**
+	 * Utility method that initialize the HashMap of valid functions with the corresponding 'placeholder' character.
+	 *
+	 */
 	private void initFunctions() {
 		hmFunctions = new HashMap<String, Character>();
 		hmFunctions.put("abs", '¬');
@@ -1072,6 +1217,11 @@ public class MathParser {
 		initValidChars();
 	}
 
+	/**
+	 * Utility method that add the 'cToadd' to the HashMap of the valid characters.
+	 *
+	 * @param 	cToAdd	The character to add.
+	 */
 	private void addValidChar(char cToAdd) {
 		cToAdd = Character.toLowerCase(cToAdd);
 		if (!hmValidChars.containsKey(cToAdd)) {
@@ -1079,10 +1229,22 @@ public class MathParser {
 		}
 	}
 
+	/**
+	 * Utility method that find the function placeholder Character starting from the function string among the functions HashMap.
+	 *
+	 * @param 	functionString	The function string to retrieve.
+	 * @return 	The placeholder corresponding Character.
+	 */
 	private Character retrieveFunction(String functionString) {
 		return hmFunctions.get(functionString.toLowerCase());
 	}
 
+	/**
+	 * Utility method that find the value id into the string 'toEvaluate'.
+	 *
+	 * @param 	toEvaulate	The string where to find the value id.
+	 * @return 	The id position.
+	 */
 	private int findValueId(String toEvaulate) {
 		int foundId = -1;
 		int beginToFind = -1, endToFind = -1;

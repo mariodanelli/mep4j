@@ -1,5 +1,5 @@
 /*
-Copyright 2015 Mario Danelli (mario.danelli[at]gmail.com)
+Copyright 2018 Mario Danelli (mario.danelli[at]gmail.com)
  
 This file is part of MEP4J.
 
@@ -18,18 +18,39 @@ along with MEP4J.  If not, see <http://www.gnu.org/licenses/>.
 
 package net.sourceforge.mep4j.core;
 
+/**
+* MEP4J MathParserException exception.
+*
+* @version 1.0.1
+* @author Mario Danelli (mario.danelli[at]gmail.com)
+*/
 public class MathParserException extends Exception {
 	private static final long serialVersionUID = 1L;
-
+	
+	/**
+	 * MathParserException 'void' constructor.
+	 *
+	 */
 	public MathParserException() {
 		super();
 	};
-	
+
+	/**
+	 * MathParserException 'String' constructor.
+	 *
+	 * @param	exceptionMsg	the exception message 
+	 */
 	public MathParserException(String exceptionMsg) {
 		super(exceptionMsg);
 	}
-	
-	public MathParserException(String exceptionMsg, Throwable th) {
-		super(exceptionMsg, th);
+
+	/**
+	 * MathParserException 'String and Throwable' constructor.
+	 *
+	 * @param	exceptionMsg	the exception message 
+	 * @param	cause			the exception cause 
+	 */
+	public MathParserException(String exceptionMsg, Throwable cause) {
+		super(exceptionMsg, cause);
 	}
 }
