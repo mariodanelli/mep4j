@@ -5,13 +5,6 @@
 ## Maven Dependency
 
 ```xml
-<repositories>
-  <repository>
-    <id>github</id>
-    <url>https://maven.pkg.github.com/mariodanelli/mep4j</url>
-  </repository>
-</repositories>
-
 <dependency>
   <groupId>io.github.mariodanelli</groupId>
   <artifactId>mep4j</artifactId>
