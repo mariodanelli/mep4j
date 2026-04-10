@@ -1,6 +1,6 @@
 # mep4j — Math Expression Parser for Java
 
-**MEP4J** is a high-performance math expression string parser for Java (J2SE >= 8).
+**MEP4J** is a high-performance math expression string parser for Java (version >= 8).
 
 ## Maven Dependency
 
