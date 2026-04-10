@@ -24,24 +24,20 @@
     <developer>
       <id>mariodanelli</id>
       <name>Mario Danelli</name>
+      <email>mario.danelli@gmail.com</email>
     </developer>
   </developers>
 
   <scm>
     <connection>scm:git:git://github.com/mariodanelli/mep4j.git</connection>
+    <developerConnection>scm:git:ssh://github.com/mariodanelli/mep4j.git</developerConnection>
     <url>https://github.com/mariodanelli/mep4j</url>
   </scm>
 
-  <distributionManagement>
-    <repository>
-      <id>github</id>
-      <name>GitHub Packages</name>
-      <url>https://maven.pkg.github.com/mariodanelli/mep4j</url>
-    </repository>
-  </distributionManagement>
-
   <build>
     <plugins>
+	
+      <!-- Compiled JAR -->
 	  <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-compiler-plugin</artifactId>
@@ -51,6 +47,8 @@
           <target>8</target>
         </configuration>
       </plugin>
+	  
+      <!-- Sources JAR -->
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-source-plugin</artifactId>
@@ -58,11 +56,13 @@
         <executions>
           <execution>
             <id>attach-sources</id>
-            <goals><goal>jar</goal></goals>
+            <goals><goal>jar-no-fork</goal></goals>
           </execution>
         </executions>
       </plugin>
-      <plugin>
+      
+      <!-- Javadoc JAR -->
+	  <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-javadoc-plugin</artifactId>
         <version>3.6.3</version>
@@ -72,6 +72,33 @@
             <goals><goal>jar</goal></goals>
           </execution>
         </executions>
+      </plugin>
+	  
+      <!-- GPG Signing -->
+	  <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-gpg-plugin</artifactId>
+        <version>3.1.0</version>
+        <executions>
+          <execution>
+            <id>sign-artifacts</id>
+            <phase>verify</phase>
+            <goals><goal>sign</goal></goals>
+          </execution>
+        </executions>
+      </plugin>
+	  
+	  <!-- Central Publishing Plugin -->
+      <plugin>
+        <groupId>org.sonatype.central</groupId>
+        <artifactId>central-publishing-maven-plugin</artifactId>
+        <version>0.4.0</version>
+        <extensions>true</extensions>
+        <configuration>
+          <publishingServerId>central</publishingServerId>
+          <tokenAuth>true</tokenAuth>
+          <autoPublish>true</autoPublish>
+        </configuration>
       </plugin>
     </plugins>
   </build>
